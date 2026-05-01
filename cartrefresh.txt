@@ -1,0 +1,185 @@
+index.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Cart</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #f2f2f2;
+        }
+
+        .cart {
+            margin: 20px;
+            font-size: 20px;
+            background: black;
+            color: white;
+            display: inline-block;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .products {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .product {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        button {
+            margin: 5px;
+            padding: 8px;
+            background: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🛒 Shopping Cart</h1>
+
+<div class="cart">
+    Items in Cart: <span id="cart-count">0</span>
+</div>
+
+<div class="products">
+
+    <div class="product">
+        <h3>Product 1</h3>
+        <p>₹500</p>
+        <button onclick="addToCart(1)">Add</button>
+        <button onclick="removeFromCart(1)">Remove</button>
+    </div>
+
+    <div class="product">
+        <h3>Product 2</h3>
+        <p>₹300</p>
+        <button onclick="addToCart(2)">Add</button>
+        <button onclick="removeFromCart(2)">Remove</button>
+    </div>
+
+</div>
+
+<script>
+    function addToCart(id) {
+        fetch("cart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "action=add&id=" + id
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("cart-count").innerText = data.totalItems;
+        });
+    }
+
+    function removeFromCart(id) {
+        fetch("cart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "action=remove&id=" + id
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("cart-count").innerText = data.totalItems;
+        });
+    }
+</script>
+
+</body>
+</html>
+
+
+
+
+CartServlet.java
+
+package com.vnr.servlet;
+
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import javax.servlet.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
+
+@WebServlet("/cart")
+public class CartServlet extends HttpServlet {
+
+    @SuppressWarnings("unchecked")
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        String action = request.getParameter("action");
+        int id = Integer.parseInt(request.getParameter("id"));
+
+        HttpSession session = request.getSession();
+        Map<Integer, Integer> cart =
+                (Map<Integer, Integer>) session.getAttribute("cart");
+
+        if (cart == null) cart = new HashMap<>();
+
+        switch (action) {
+            case "add":
+                cart.put(id, cart.getOrDefault(id, 0) + 1);
+                break;
+            case "remove":
+                cart.remove(id);
+                break;
+        }
+
+        session.setAttribute("cart", cart);
+
+        int total = cart.values().stream().mapToInt(i -> i).sum();
+        out.print("{\"totalItems\": " + total + "}");
+    }
+}
+
+
+pom.xml
+
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.vnr</groupId>
+    <artifactId>ShoppingCartApp</artifactId>
+    <version>1.0</version>
+
+    <packaging>war</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>
+
+
+
+How to Run
+Import as Maven Project in Eclipse
+Right-click → Run on Server (Tomcat)
+Open:
+http://localhost:8080/ShoppingCartApp/index.html

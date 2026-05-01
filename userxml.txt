@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE users SYSTEM "user.dtd">
+
+<users xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="user.xsd">
+    <user>
+        <username>charan123</username>
+        <password>pass123</password>
+        <email>charan@gmail.com</email>
+
+        <purchaseHistory>
+            <purchase>
+                <item>Java Book</item>
+                <price>500</price>
+            </purchase>
+            <purchase>
+                <item>Python Book</item>
+                <price>400</price>
+            </purchase>
+        </purchaseHistory>
+    </user>
+</users>
+
+<!ELEMENT users (user+)>
+
+<!ELEMENT user (username, password, email, purchaseHistory)>
+
+<!ELEMENT username (#PCDATA)>
+<!ELEMENT password (#PCDATA)>
+<!ELEMENT email (#PCDATA)>
+
+<!ELEMENT purchaseHistory (purchase+)>
+<!ELEMENT purchase (item, price)>
+
+<!ELEMENT item (#PCDATA)>
+<!ELEMENT price (#PCDATA)>
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="users">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="user" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="username" type="xs:string"/>
+                            <xs:element name="password" type="xs:string"/>
+                            <xs:element name="email" type="xs:string"/>
+
+                            <xs:element name="purchaseHistory">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="purchase" maxOccurs="unbounded">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="item" type="xs:string"/>
+                                                    <xs:element name="price" type="xs:decimal"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

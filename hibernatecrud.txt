@@ -1,0 +1,180 @@
+
+Book.java
+package com.vnr.model;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = "books")
+public class Book {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "book_id")
+    private int id;
+
+    @Column(name = "title")
+    private String title;
+
+    @Column(name = "author")
+    private String author;
+
+    @Column(name = "price")
+    private double price;
+
+    public Book() {}
+
+    public Book(String title, String author, double price) {
+        this.title = title;
+        this.author = author;
+        this.price = price;
+    }
+
+    public int getId() { return id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getAuthor() { return author; }
+    public void setAuthor(String author) { this.author = author; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+
+    @Override
+    public String toString() {
+        return id + " | " + title + " | " + author + " | " + price;
+    }
+}
+
+
+
+
+MainApp.java
+package com.vnr;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+
+import com.vnr.model.Book;
+
+import java.util.List;
+
+public class MainApp {
+
+    public static void main(String[] args) {
+
+        Configuration cfg = new Configuration();
+        cfg.configure();
+
+        SessionFactory sf = cfg.buildSessionFactory();
+        Session session = sf.openSession();
+        Transaction tx = session.beginTransaction();
+
+        //  CREATE
+        Book b1 = new Book("Java", "James Gosling", 500);
+        Book b2 = new Book("Python", "Guido", 400);
+
+        session.save(b1);
+        session.save(b2);
+
+        //  READ
+        List<Book> list = session.createQuery("from Book", Book.class).list();
+
+        System.out.println("Books in DB:");
+        for (Book b : list) {
+            System.out.println(b);
+        }
+
+        //  UPDATE
+        Book book = session.get(Book.class, 1);
+        if (book != null) {
+            book.setPrice(750);
+            session.update(book);
+        }
+
+        //  DELETE
+        Book delBook = session.get(Book.class, 2);
+        if (delBook != null) {
+            session.delete(delBook);
+        }
+
+        tx.commit();
+        session.close();
+        sf.close();
+
+        System.out.println("CRUD operations completed!");
+    }
+}
+
+
+hibernate.cfg.xml
+
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+ "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+ "https://hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+
+        <!-- DB Connection -->
+        <property name="hibernate.connection.driver_class">
+            com.mysql.cj.jdbc.Driver
+        </property>
+
+        <property name="hibernate.connection.url">
+            jdbc:mysql://localhost:3306/hibernateAnnotate
+        </property>
+
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">root</property>
+
+        <!-- Hibernate Settings -->
+        <property name="hibernate.dialect">
+            org.hibernate.dialect.MySQL8Dialect
+        </property>
+
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+
+        <!-- Auto table creation -->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <!-- Entity Mapping -->
+        <mapping class="com.vnr.model.Book"/>
+
+    </session-factory>
+</hibernate-configuration>
+
+
+
+
+pom.xml
+
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-core</artifactId>
+    <version>5.4.33.Final</version>
+</dependency>
+
+<dependency>
+    <groupId>javax.persistence</groupId>
+    <artifactId>javax.persistence-api</artifactId>
+    <version>2.2</version>
+</dependency>
+
+<dependency>
+    <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+    <version>8.0.33</version>
+</dependency>
+
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-simple</artifactId>
+    <version>1.7.36</version>
+</dependency>
+

@@ -1,0 +1,56 @@
+login.jsp
+<%@ page import="java.util.Date" %>   <!-- Directive -->
+
+<html>
+<head>
+    <title>Login Page</title>
+</head>
+<body>
+
+<h2>Login Form</h2>
+
+<!-- HTML Form -->
+<form method="post">
+    Username: <input type="text" name="user"><br><br>
+    Password: <input type="password" name="pass"><br><br>
+    <input type="submit" value="Login">
+</form>
+
+<hr>
+
+<%! 
+    // Declaration (class-level variable + method)
+    String validUser = "admin";
+    String validPass = "1234";
+
+    boolean checkLogin(String u, String p) {
+        return u != null && p != null && u.equals(validUser) && p.equals(validPass);
+    }
+%>
+
+<%
+    // Scriptlet (Java code block)
+    String user = request.getParameter("user");
+    String pass = request.getParameter("pass");
+
+    if (user != null && pass != null) {
+        if (checkLogin(user, pass)) {
+%>
+            <h3 style="color:green;">Login Successful!</h3>
+<%
+        } else {
+%>
+            <h3 style="color:red;">Invalid Credentials</h3>
+<%
+        }
+    }
+%>
+
+<hr>
+
+<!-- Expression (display value directly) -->
+<h3>Current Date & Time:</h3>
+<p><%= new Date() %></p>
+
+</body>
+</html>
