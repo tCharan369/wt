@@ -1,0 +1,102 @@
+
+index.jsp
+<html>
+<body>
+<h2>Book Library</h2>
+<a href="books">Load Books</a>
+</body>
+</html>
+
+
+content.jsp
+<%@ page import="java.util.*" %>
+
+<html>
+<body>
+
+<h2>Book List</h2>
+
+<%
+    List<String> books = (List<String>) request.getAttribute("books");
+
+    if (books != null) {
+        for (String b : books) {
+%>
+            <p><%= b %></p>
+<%
+        }
+    }
+%>
+
+</body>
+</html>
+
+
+web.xml
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         version="5.0">
+
+    <servlet>
+        <servlet-name>BookServlet</servlet-name>
+        <servlet-class>BookServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>BookServlet</servlet-name>
+        <url-pattern>/books</url-pattern>
+    </servlet-mapping>
+
+</web-app>
+
+
+BookServlet.java
+import java.io.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import java.sql.*;
+import java.util.*;
+
+public class BookServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        List<String> books = new ArrayList<>();
+
+        try {
+            Connection con = DBConnection.getConnection();
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM books");
+
+            while (rs.next()) {
+                books.add(rs.getString("title") + " - " + rs.getString("author"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        request.setAttribute("books", books);
+        RequestDispatcher rd = request.getRequestDispatcher("content.jsp");
+        rd.forward(request, response);
+    }
+}
+
+
+
+DBConnection.java
+import java.sql.*;
+
+public class DBConnection {
+
+    public static Connection getConnection() throws Exception {
+
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        return DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/library?useSSL=false&serverTimezone=UTC",
+            "root",
+            "root"   	
+        );
+    }
+}
