@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE bookstore [
+
+    <!ELEMENT bookstore (book+)>
+    <!ELEMENT book (title, author, genre, price, availability)>
+
+    <!ELEMENT title (#PCDATA)>
+    <!ELEMENT author (#PCDATA)>
+    <!ELEMENT genre (#PCDATA)>
+    <!ELEMENT price (#PCDATA)>
+    <!ELEMENT availability (#PCDATA)>
+
+]>
+
+//<!DOCTYPE bookstore SYSTEM "books.dtd">
+
+<bookstore xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="books.xsd">
+    <book>
+        <title>Java</title>
+        <author>James</author>
+        <genre>Tech</genre>
+        <price>500</price>
+        <availability>In Stock</availability>
+    </book>
+</bookstore>
+
+
+//XSD
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="bookstore">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="book" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="title" type="xs:string"/>
+                            <xs:element name="author" type="xs:string"/>
+                            <xs:element name="genre" type="xs:string"/>
+                            <xs:element name="price" type="xs:decimal"/>
+                            <xs:element name="availability" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
